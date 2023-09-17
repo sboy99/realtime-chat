@@ -1,3 +1,3 @@
 export const Queues = {
-  AUTH: 'auth_queue',
+  AUTH_QUEUE: 'auth_queue',
 } as const;
