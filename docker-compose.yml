@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: pnpm run start:dev auth
+    container_name: realtime_chat_auth
+    env_file:
+      - ./apps/auth/.env
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - realtime_chat_net
+
+  # Infra
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    env_file:
+      - .env
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-q', '-d', 'chatdb', '-U', 'chatuser']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    networks:
+      - realtime_chat_net
+    volumes:
+      - realtime_chat_data:/var/lib/postgresql/data
+
+  # Utility
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - '8080:80'
+    networks:
+      - realtime_chat_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  realtime_chat_data:
+    name: realtime_chat_data
+
+networks:
+  realtime_chat_net:
+    name: realtime_chat_net
+    driver: bridge
