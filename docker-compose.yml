@@ -8,6 +8,9 @@ services:
       target: development
     command: pnpm run start:dev auth
     container_name: realtime_chat_auth
+    depends_on:
+      - postgres
+      - rabbitmq
     env_file:
       - ./apps/auth/.env
     ports:
@@ -43,8 +46,6 @@ services:
       - '5672:5672'
     networks:
       - realtime_chat_net
-    volumes:
-      - realtime_chat_broker:/var/lib/rabbitmq
 
   # Utility
   pgadmin:
@@ -64,8 +65,6 @@ services:
 volumes:
   realtime_chat_data:
     name: realtime_chat_data
-  realtime_chat_broker:
-    name: realtime_chat_broker
 
 networks:
   realtime_chat_net:

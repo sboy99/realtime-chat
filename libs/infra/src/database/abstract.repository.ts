@@ -1,4 +1,4 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import {
   EntityManager,
   FindOptionsRelations,
@@ -12,7 +12,7 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   protected abstract readonly logger: Logger;
 
   constructor(
-    private readonly itemsRepository: Repository<T>,
+    private readonly entityRepository: Repository<T>,
     private readonly entityManager: EntityManager,
   ) {}
 
@@ -21,18 +21,35 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   }
 
   async list(where: FindOptionsWhere<T>) {
-    return this.itemsRepository.findBy(where);
+    return this.entityRepository.findBy(where);
+  }
+
+  async checkUnique(
+    where: FindOptionsWhere<T>,
+    relations?: FindOptionsRelations<T>,
+    entityfoundMessage = 'Entity already exists!',
+  ): Promise<true> {
+    const entity = await this.entityRepository.findOne({
+      where,
+      relations,
+    });
+    if (!!entity) {
+      this.logger.warn('Document found with where', where);
+      throw new BadRequestException(entityfoundMessage);
+    }
+    return true;
   }
 
   async findOne(
     where: FindOptionsWhere<T>,
     relations?: FindOptionsRelations<T>,
+    notfoundMessage = 'Entity not found.',
   ): Promise<T> {
-    const entity = await this.itemsRepository.findOne({ where, relations });
+    const entity = await this.entityRepository.findOne({ where, relations });
 
     if (!entity) {
       this.logger.warn('Document not found with where', where);
-      throw new NotFoundException('Entity not found.');
+      throw new NotFoundException(notfoundMessage);
     }
 
     return entity;
@@ -42,7 +59,7 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
     where: FindOptionsWhere<T>,
     partialEntity: QueryDeepPartialEntity<T>,
   ) {
-    const updateResult = await this.itemsRepository.update(
+    const updateResult = await this.entityRepository.update(
       where,
       partialEntity,
     );
@@ -56,6 +73,6 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   }
 
   async findOneAndDelete(where: FindOptionsWhere<T>) {
-    await this.itemsRepository.delete(where);
+    await this.entityRepository.delete(where);
   }
 }
