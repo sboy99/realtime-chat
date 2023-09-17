@@ -9,6 +9,12 @@ export class UserService {
   constructor(private readonly userRepo: UserRepository) {}
 
   public async create(createUserDto: CreateUserDto) {
+    // check if user already exists
+    await this.userRepo.checkUnique({
+      email: createUserDto.email,
+    });
+
+    // create user
     const user = new User(createUserDto);
     return this.userRepo.create(user);
   }

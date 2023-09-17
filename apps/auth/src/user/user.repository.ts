@@ -10,9 +10,9 @@ export class UserRepository extends AbstractRepository<User> {
 
   constructor(
     @InjectRepository(User)
-    itemsRepository: Repository<User>,
+    entityRepository: Repository<User>,
     entityManager: EntityManager,
   ) {
-    super(itemsRepository, entityManager);
+    super(entityRepository, entityManager);
   }
 }
