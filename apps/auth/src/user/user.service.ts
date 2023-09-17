@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { User } from '../../../../libs/common/src/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -19,8 +19,12 @@ export class UserService {
     return this.userRepo.create(user);
   }
 
-  findAll() {
+  listUsers() {
     return `This action returns all user`;
+  }
+
+  findByEmail(email: string) {
+    return this.userRepo.findOne({ email });
   }
 
   findOne(id: number) {
