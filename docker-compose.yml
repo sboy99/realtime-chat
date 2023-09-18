@@ -9,8 +9,10 @@ services:
     command: pnpm run start:dev auth
     container_name: realtime_chat_auth
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     env_file:
       - ./apps/auth/.env
     ports:
@@ -27,7 +29,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: ['CMD', 'pg_isready', '-q', '-d', 'chatdb', '-U', 'chatuser']
+      test: pg_isready -q -d chatdb -U chatuser
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,8 +44,15 @@ services:
     image: rabbitmq
     container_name: realtime_chat_rabbitmq
     restart: always
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - '5672:5672'
+    volumes:
+      - realtime_chat_broker:/var/lib/rabbitmq/mnesia/
     networks:
       - realtime_chat_net
 
@@ -65,6 +74,8 @@ services:
 volumes:
   realtime_chat_data:
     name: realtime_chat_data
+  realtime_chat_broker:
+    name: realtime_chat_broker
 
 networks:
   realtime_chat_net:

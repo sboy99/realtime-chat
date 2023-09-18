@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 const firstName = z.string();
 const lastName = z.string();
-const avatar = z.string().url().nullable();
+const avatar = z.string().url().nullable().default(null).optional();
 const email = z.string().email();
 const password = z.string();
 

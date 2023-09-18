@@ -6,6 +6,7 @@ import {
   Repository,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { UpsertOptions } from 'typeorm/repository/UpsertOptions';
 import { AbstractEntity } from './abstract.entity';
 
 export abstract class AbstractRepository<T extends AbstractEntity<T>> {
@@ -18,6 +19,13 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
 
   async create(entity: T): Promise<T> {
     return this.entityManager.save(entity);
+  }
+
+  async upsert(
+    partialEntity: QueryDeepPartialEntity<T>,
+    conflictPathsOrOptions: UpsertOptions<T>,
+  ) {
+    return this.entityRepository.upsert(partialEntity, conflictPathsOrOptions);
   }
 
   async list(where: FindOptionsWhere<T>) {
