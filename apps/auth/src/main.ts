@@ -33,6 +33,6 @@ async function bootstrap() {
   await app.startAllMicroservices();
 
   // port
-  await app.listen(configService.get('HTTP_PORT'));
+  await app.listen(configService.getOrThrow<number>('HTTP_PORT'));
 }
 bootstrap();

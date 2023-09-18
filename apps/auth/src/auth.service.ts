@@ -2,6 +2,7 @@ import { MessagePatterns, Services } from '@app/common/constants';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import * as bcryptjs from 'bcryptjs';
+import { parse as getUserAgent } from 'express-useragent';
 import { LoginDto } from './dto/login.dto';
 import { CreateSessionDto } from './session/dto/create-session.dto';
 import { CreateUserDto } from './user/dto/create-user.dto';
@@ -41,7 +42,13 @@ export class AuthService {
   }
 
   private getUserDevice(userAgent: string): string {
-    //
-    return userAgent;
+    // Get human readable user agent from user agent
+    const ua = getUserAgent(userAgent);
+    const deviceTypeField = Object.keys(ua).find((field) => !!ua[field]);
+    const deviceType = !!deviceTypeField
+      ? deviceTypeField.replace('is', '')
+      : 'unknown';
+
+    return `${deviceType}, ${ua.browser} on ${ua.os}`;
   }
 }

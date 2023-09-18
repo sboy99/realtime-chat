@@ -6,14 +6,17 @@ import {
   CreateSessionDto,
   CreateSessionSchema,
 } from './dto/create-session.dto';
+import { SessionService } from './session.service';
 
 @Controller('session')
 export class SessionController {
+  constructor(private readonly sessionService: SessionService) {}
+
   @MessagePattern(MessagePatterns.USER_LOGIN)
-  createUserSession(
+  async createUserSession(
     @Payload(new ZodValidationPipe(CreateSessionSchema))
     createSessionDto: CreateSessionDto,
-  ): void {
-    console.log(createSessionDto);
+  ): Promise<void> {
+    await this.sessionService.create(createSessionDto);
   }
 }

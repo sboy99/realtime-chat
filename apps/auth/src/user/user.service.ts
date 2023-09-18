@@ -8,6 +8,15 @@ import { UserRepository } from './user.repository';
 export class UserService {
   constructor(private readonly userRepo: UserRepository) {}
 
+  public async getUserProfile(userId: string) {
+    return await this.userRepo.findOne(
+      { id: userId },
+      {
+        sessions: true,
+      },
+    );
+  }
+
   public async create(createUserDto: CreateUserDto) {
     // check if user already exists
     await this.userRepo.checkUnique({
