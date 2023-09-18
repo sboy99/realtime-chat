@@ -17,3 +17,7 @@ export const HTTP_PORT = num;
 export const RABBITMQ_URI = str;
 // Secrets
 export const COOKIE_SECRET = str;
+// Jwt
+export const JWT_SECRET = str;
+export const JWT_ACCESS_TOKEN_EXPIRY = str;
+export const JWT_REFRESH_TOKEN_EXPIRY = str;

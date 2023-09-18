@@ -1,4 +1,4 @@
-import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import {
   EntityManager,
   FindOptionsRelations,
@@ -42,8 +42,8 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
       relations,
     });
     if (!!entity) {
-      this.logger.warn('Document found with where', where);
-      throw new BadRequestException(entityfoundMessage);
+      this.logger.warn('Document confict with where', where);
+      throw new ConflictException(entityfoundMessage);
     }
     return true;
   }
