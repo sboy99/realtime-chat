@@ -1,3 +1,4 @@
+import { User } from '@app/common/decorators';
 import {
   Body,
   Controller,
@@ -7,6 +8,7 @@ import {
   ParseUUIDPipe,
   Patch,
 } from '@nestjs/common';
+import { CanAccess } from '../decorators/can-access';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
@@ -19,8 +21,9 @@ export class UserController {
     return this.userService.listUsers();
   }
 
-  @Get('profile/:id')
-  getUserProfile(@Param('id', ParseUUIDPipe) userId: string) {
+  @Get('profile')
+  @CanAccess()
+  getUserProfile(@User('id', ParseUUIDPipe) userId: string) {
     return this.userService.getUserProfile(userId);
   }
 

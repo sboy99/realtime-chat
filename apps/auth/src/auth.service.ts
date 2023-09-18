@@ -1,9 +1,14 @@
 import { MessagePatterns, Services } from '@app/common/constants';
+import { User } from '@app/common/entities';
+import { TJwtUser } from '@app/common/types';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
 import * as bcryptjs from 'bcryptjs';
 import { parse as getUserAgent } from 'express-useragent';
 import { LoginDto } from './dto/login.dto';
+import { TAuthEnv } from './env';
 import { CreateSessionDto } from './session/dto/create-session.dto';
 import { CreateUserDto } from './user/dto/create-user.dto';
 import { UserService } from './user/user.service';
@@ -12,6 +17,8 @@ import { UserService } from './user/user.service';
 export class AuthService {
   constructor(
     private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService<TAuthEnv>,
     @Inject(Services.AUTH_SERVICE) private readonly authClient: ClientProxy,
   ) {}
 
@@ -23,8 +30,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(loginDto.email);
     await this.verifyPassword(loginDto.password, user.password);
 
-    // if valid user
-    // > create session
+    // if valid user create session
     this.authClient.emit<any, CreateSessionDto>(MessagePatterns.USER_LOGIN, {
       ip,
       userAgent,
@@ -33,6 +39,15 @@ export class AuthService {
     });
 
     return user;
+  }
+
+  public async generateAccessToken(user: User) {
+    const userPayload = this.getUserJwtPayload(user);
+    return this.jwtService.signAsync(userPayload, {
+      expiresIn: this.configService.getOrThrow<string>(
+        'JWT_ACCESS_TOKEN_EXPIRY',
+      ),
+    });
   }
 
   private async verifyPassword(pass: string, hash: string): Promise<true> {
@@ -50,5 +65,14 @@ export class AuthService {
       : 'unknown';
 
     return `${deviceType}, ${ua.browser} on ${ua.os}`;
+  }
+
+  private getUserJwtPayload(user: User): TJwtUser {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+    };
   }
 }

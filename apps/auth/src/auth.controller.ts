@@ -22,7 +22,11 @@ export class AuthController {
     @Ip() ip: string,
     @Headers('user-agent') userAgent: string,
   ) {
+    // Verify login credentials
     const user = await this.authService.login(loginDto, ip, userAgent);
-    return user;
+    // Generate access token
+    const accessToken = await this.authService.generateAccessToken(user);
+    // return response
+    return { accessToken };
   }
 }
