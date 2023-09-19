@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
-import { TDatabaseEnvSchema } from './env';
+import { TDatabaseEnv } from './env';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      inject: [ConfigService<TDatabaseEnvSchema>],
-      useFactory: (configService: ConfigService<TDatabaseEnvSchema>) => ({
+      inject: [ConfigService<TDatabaseEnv>],
+      useFactory: (configService: ConfigService<TDatabaseEnv>) => ({
         type: 'postgres',
         host: configService.getOrThrow<string>('POSTGRES_HOST'),
         port: configService.getOrThrow<number>('POSTGRES_PORT'),

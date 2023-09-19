@@ -18,4 +18,4 @@ export const DatabaseEnvSchema = z.object({
   POSTGRES_PASSWORD,
 });
 
-export type TDatabaseEnvSchema = z.infer<typeof DatabaseEnvSchema>;
+export type TDatabaseEnv = z.infer<typeof DatabaseEnvSchema>;
