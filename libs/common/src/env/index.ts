@@ -21,3 +21,9 @@ export const COOKIE_SECRET = str;
 export const JWT_SECRET = str;
 export const JWT_ACCESS_TOKEN_EXPIRY = str;
 export const JWT_REFRESH_TOKEN_EXPIRY = str;
+// Elastic Search
+export const ELASTIC_SEARCH_NODE = str;
+export const ELASTIC_SEARCH_INDEX = str;
+export const ELASTIC_SEARCH_USER = str;
+export const ELASTIC_SEARCH_PASSWORD = str;
+// export const ELASTIC_SEARCH_NODE = str;

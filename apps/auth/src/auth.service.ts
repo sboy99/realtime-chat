@@ -10,7 +10,7 @@ import { parse as getUserAgent } from 'express-useragent';
 import { LoginDto } from './dto/login.dto';
 import { TAuthEnv } from './env';
 import { CreateSessionDto } from './session/dto/create-session.dto';
-import { CreateUserDto } from './user/dto/create-user.dto';
+import { CreateUserDto } from './user/dto';
 import { UserService } from './user/user.service';
 
 @Injectable()

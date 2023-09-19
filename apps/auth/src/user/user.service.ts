@@ -1,12 +1,15 @@
+import { User } from '@app/common/entities';
 import { Injectable } from '@nestjs/common';
-import { User } from '../../../../libs/common/src/entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto, SearchUserDto, UpdateUserDto } from './dto';
 import { UserRepository } from './user.repository';
+import { UserSearch } from './user.search';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepo: UserRepository) {}
+  constructor(
+    private readonly userRepo: UserRepository,
+    private readonly userSearch: UserSearch,
+  ) {}
 
   public async getUserProfile(userId: string) {
     return await this.userRepo.findOne(
@@ -15,6 +18,10 @@ export class UserService {
         sessions: true,
       },
     );
+  }
+
+  public async searchUser(searchQuery: SearchUserDto) {
+    return this.userSearch.searchIndex(searchQuery);
   }
 
   public async create(createUserDto: CreateUserDto) {

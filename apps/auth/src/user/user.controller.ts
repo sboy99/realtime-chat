@@ -1,4 +1,5 @@
 import { User } from '@app/common/decorators';
+import { ZodValidationPipe } from '@app/common/pipes';
 import {
   Body,
   Controller,
@@ -7,9 +8,10 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
 } from '@nestjs/common';
 import { CanAccess } from '../decorators/can-access';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { SearchUserDto, SearchUserSchema, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -25,6 +27,14 @@ export class UserController {
   @CanAccess()
   getUserProfile(@User('id', ParseUUIDPipe) userId: string) {
     return this.userService.getUserProfile(userId);
+  }
+
+  @Post('search')
+  @CanAccess()
+  searchUser(
+    @Body(new ZodValidationPipe(SearchUserSchema)) searchUserDto: SearchUserDto,
+  ) {
+    return this.userService.searchUser(searchUserDto);
   }
 
   @Get(':id')

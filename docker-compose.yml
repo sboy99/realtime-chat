@@ -13,6 +13,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     env_file:
       - ./apps/auth/.env
     ports:
@@ -56,6 +58,36 @@ services:
     networks:
       - realtime_chat_net
 
+  elasticsearch:
+    image: elasticsearch:8.9.2
+    container_name: elasticsearch
+    environment:
+      - node.name=es-node
+      - cluster.name=chat_cluster
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - realtime_chat_es_data:/usr/share/elasticsearch/data
+    networks:
+      - realtime_chat_net
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -u ${ELASTIC_SEARCH_USER}:${ELASTIC_SEARCH_PASSWORD} localhost:9200/_cluster/health || exit 1',
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
   # Utility
   pgadmin:
     image: dpage/pgadmin4
@@ -76,6 +108,8 @@ volumes:
     name: realtime_chat_data
   realtime_chat_broker:
     name: realtime_chat_broker
+  realtime_chat_es_data:
+    name: realtime_chat_es_data
 
 networks:
   realtime_chat_net:
