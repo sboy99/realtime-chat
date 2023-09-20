@@ -1,6 +1,6 @@
 import { User } from '@app/common/entities';
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, SearchUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserRepository } from './user.repository';
 import { UserSearch } from './user.search';
 
@@ -20,8 +20,12 @@ export class UserService {
     );
   }
 
-  public async searchUser(searchQuery: SearchUserDto) {
-    return this.userSearch.searchIndex(searchQuery);
+  public async searchUser(q: string) {
+    const results = await this.userSearch.search({
+      search: q,
+      fields: ['firstName', 'lastName'],
+    });
+    return results?.hits?.hits.map((h) => h._source) ?? [];
   }
 
   public async create(createUserDto: CreateUserDto) {

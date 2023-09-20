@@ -1,12 +1,13 @@
 import { estypes } from '@elastic/elasticsearch';
-import { QueryDslMatchQuery } from '@elastic/elasticsearch/lib/api/types';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { AbstractEntity } from '../database';
 import { TElasticSearchEnv } from './env';
 
-export abstract class AbstractSearch<T extends AbstractEntity<T>> {
+export abstract class AbstractSearch<
+  T extends Omit<AbstractEntity<T>, 'updatedAt'>,
+> {
   protected abstract readonly logger: Logger;
 
   constructor(
@@ -14,17 +15,28 @@ export abstract class AbstractSearch<T extends AbstractEntity<T>> {
     private readonly configService: ConfigService<TElasticSearchEnv>,
   ) {}
 
-  async searchIndex(
-    match: Partial<
-      Record<keyof T, string | number | boolean | QueryDslMatchQuery>
-    >,
-  ) {
-    console.log(this.prepareRegex(match));
-
+  async search({
+    search,
+    fields,
+    limit = 5,
+  }: {
+    search: string;
+    fields: Array<keyof T>;
+    limit?: number;
+  }) {
     return this.esService.search<T>({
       index: this.configService.getOrThrow<string>('ELASTIC_SEARCH_INDEX'),
+      size: limit,
       query: {
-        regexp: this.prepareRegex(match),
+        bool: {
+          should: fields.map<estypes.QueryDslQueryContainer>((f) => ({
+            wildcard: {
+              [f]: {
+                value: this.prepareSeachWildcard(search),
+              },
+            },
+          })),
+        },
       },
     });
   }
@@ -44,25 +56,11 @@ export abstract class AbstractSearch<T extends AbstractEntity<T>> {
     });
   }
 
-  private prepareRegex(
-    query: Partial<
-      Record<keyof T, string | number | boolean | QueryDslMatchQuery>
-    >,
-  ): Record<string, estypes.QueryDslRegexpQuery> {
-    return Object.keys(query).reduce<
-      Record<string, estypes.QueryDslRegexpQuery>
-    >((acc, curr) => {
-      if (!!query?.[curr]) {
-        const currRegx: estypes.QueryDslRegexpQuery = {
-          value: `${query[curr]}`,
-          flags: 'ALL',
-          case_insensitive: true,
-          max_determinized_states: 10000,
-          rewrite: 'constant_score',
-        };
-        acc[curr] = currRegx;
-      }
-      return acc;
-    }, {});
+  private prepareSeachWildcard(str: string) {
+    let s = '*';
+    for (const char of str) {
+      s = `${s}${char}*`;
+    }
+    return s;
   }
 }

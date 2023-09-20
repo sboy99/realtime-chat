@@ -31,10 +31,10 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
     const insertIndex = await this.userSearch.insertIndex({
       id: event.entity.id,
       email: event.entity.email,
+      avatar: event.entity.avatar,
       firstName: event.entity.firstName,
       lastName: event.entity.lastName,
       createdAt: event.entity.createdAt,
-      updatedAt: event.entity.createdAt,
     });
 
     this.logger.log(`Search Index updated of ${insertIndex._id}`);

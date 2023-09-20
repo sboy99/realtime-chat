@@ -1,0 +1,23 @@
+# server.name: 'kibana.example.com'
+server.host: '0.0.0.0'
+server.port: 5601
+
+elasticsearch.hosts: ['http://elasticsearch:9200']
+elasticsearch.username: 'kibana'
+elasticsearch.password: 'qqYKn3Bri1VyhTakevdf'
+
+# logging.dest: /var/log/kibana/kibana.log
+# logging.rotate.enabled: true
+# logging.rotate.keepfiles: 7
+
+xpack.security.enabled: true
+# xpack.security.encryptionKey: 'your_encryption_key'
+
+# xpack.reporting.encryptionKey: 'your_reporting_encryption_key'
+# xpack.reporting.kibanaServer.hostname: 'kibana.example.com'
+# xpack.reporting.kibanaServer.protocol: 'https'
+# xpack.reporting.kibanaServer.port: 5601
+
+# xpack.monitoring.ui.container.elasticsearch.enabled: true
+# xpack.encryptedSavedObjects.encryptionKey: 'your_encryption_key'
+# Add any additional configurations as needed

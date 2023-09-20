@@ -7,7 +7,7 @@ import { TAuthEnv } from '../env';
 
 @Injectable()
 export class UserSearch extends AbstractSearch<
-  Omit<User, 'password' | 'sessions' | 'avatar'>
+  Omit<User, 'password' | 'sessions' | 'updatedAt'>
 > {
   protected readonly logger = new Logger(UserSearch.name);
   constructor(
