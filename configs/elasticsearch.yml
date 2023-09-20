@@ -10,7 +10,7 @@ discovery.type: 'single-node'
 bootstrap.memory_lock: true
 
 xpack.security.enabled: true
-xpack.security.enrollment.enabled: true
+# xpack.security.enrollment.enabled: true
 # xpack.security.transport.ssl.enabled: true
 # xpack.security.transport.ssl.verification_mode: certificate
 

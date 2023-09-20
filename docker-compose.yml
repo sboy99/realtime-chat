@@ -63,7 +63,6 @@ services:
     container_name: elasticsearch
     environment:
       - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
-      - ENROLLMENT_TOKEN:${ES_ENROLLMENT_TOKEN}
     ulimits:
       memlock:
         soft: -1
@@ -73,7 +72,7 @@ services:
       - 9300:9300
     volumes:
       - realtime_chat_es_data:/usr/share/elasticsearch/data
-      - ./search/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./configs/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     networks:
       - realtime_chat_net
     healthcheck:
@@ -110,7 +109,7 @@ services:
       elasticsearch:
         condition: service_healthy
     volumes:
-      - ./search/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./configs/kibana.yml:/usr/share/kibana/config/kibana.yml
     networks:
       - realtime_chat_net
 
