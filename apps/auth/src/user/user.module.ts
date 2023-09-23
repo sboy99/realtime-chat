@@ -1,4 +1,4 @@
-import { User } from '@app/common/entities';
+import { Conversation, User } from '@app/common/entities';
 import { DatabaseModule } from '@app/infra/database';
 import { SearchModule } from '@app/infra/search';
 import { Module } from '@nestjs/common';
@@ -9,7 +9,7 @@ import { UserService } from './user.service';
 import { UserSubscriber } from './user.subscriber';
 
 @Module({
-  imports: [DatabaseModule.forFeature([User]), SearchModule],
+  imports: [DatabaseModule.forFeature([User, Conversation]), SearchModule],
   controllers: [UserController],
   providers: [UserService, UserSubscriber, UserSearch, UserRepository],
   exports: [UserService],

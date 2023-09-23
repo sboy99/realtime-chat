@@ -1,14 +1,14 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Request } from 'express';
-import { TJwtUser } from '../types';
+import { IRequest } from '../interfaces';
+import { TUser } from '../types';
 
 export const User = createParamDecorator(
   (
-    data: keyof TJwtUser | undefined,
+    data: keyof TUser | undefined,
     ctx: ExecutionContext,
-  ): TJwtUser | TJwtUser[keyof TJwtUser] => {
-    const request = ctx.switchToHttp().getRequest<Request>();
-    if (!data) return request.user as TJwtUser;
+  ): TUser | TUser[keyof TUser] => {
+    const request = ctx.switchToHttp().getRequest<IRequest>();
+    if (!data) return request.user as TUser;
     return request?.user?.[data];
   },
 );

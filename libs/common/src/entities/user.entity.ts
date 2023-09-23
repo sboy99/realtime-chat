@@ -1,5 +1,6 @@
 import { AbstractEntity } from '@app/infra/database';
-import { Column, Entity, OneToMany, Unique } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, Unique } from 'typeorm';
+import { Conversation } from './conversation.entity';
 import { Session } from './session.entity';
 
 @Entity('users')
@@ -20,6 +21,12 @@ export class User extends AbstractEntity<User> {
   @Column()
   password: string;
 
+  @Column({ default: false })
+  isBlocked?: boolean;
+
   @OneToMany(() => Session, (session) => session.user, { cascade: ['remove'] })
-  sessions?: string[] | Session[];
+  sessions?: Array<string | Session>;
+
+  @ManyToMany(() => Conversation, (conversation) => conversation.participants)
+  conversations?: Array<string | Conversation>;
 }

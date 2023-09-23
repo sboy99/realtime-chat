@@ -7,8 +7,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { Request } from 'express';
 import { ZodError } from 'zod';
+import { IRequest } from '../interfaces';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -18,7 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
-    const req = ctx.getRequest<Request>();
+    const req = ctx.getRequest<IRequest>();
 
     const path = req.originalUrl;
     const time = new Date(Date.now());

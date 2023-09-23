@@ -1,4 +1,4 @@
-import { AbstractSchema } from '@app/common/dto';
+import { AbstractSchema } from '@app/common/dtos';
 import { z } from 'zod';
 
 const firstName = z.string();

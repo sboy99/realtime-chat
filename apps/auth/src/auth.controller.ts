@@ -1,14 +1,15 @@
+import { Routes } from '@app/common/constants';
 import { ZodValidationPipe } from '@app/common/pipes';
 import { Body, Controller, Headers, Ip, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginSchema } from './dto/login.dto';
 import { CreateUserDto, CreateUserSchema } from './user/dto';
 
-@Controller('auth')
+@Controller(Routes.AUTH.DEFAULT)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Post(Routes.AUTH.REGISTER)
   async register(
     @Body(new ZodValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto,
   ) {
@@ -16,7 +17,7 @@ export class AuthController {
     return registeredUser;
   }
 
-  @Post('login')
+  @Post(Routes.AUTH.LOGIN)
   async login(
     @Body(new ZodValidationPipe(LoginSchema)) loginDto: LoginDto,
     @Ip() ip: string,

@@ -1,2 +1,3 @@
 export * from './jwt-user.type';
-export * from './utils';
+export * from './user.type';
+export * from './utility.type';

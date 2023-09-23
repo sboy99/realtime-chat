@@ -24,6 +24,27 @@ services:
     networks:
       - realtime_chat_net
 
+  conversation:
+    build:
+      context: .
+      dockerfile: ./apps/conversation/Dockerfile
+      target: development
+    command: pnpm run start:dev conversation
+    container_name: realtime_chat_conversation
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - ./apps/conversation/.env
+    ports:
+      - '3002:3002'
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - realtime_chat_net
+
   # Infra
   postgres:
     image: postgres:latest

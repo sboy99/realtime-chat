@@ -1,4 +1,4 @@
-import { UserDto } from '../dto';
+import { UserDto } from '../dtos';
 
 export type TJwtUser = Pick<
   UserDto,

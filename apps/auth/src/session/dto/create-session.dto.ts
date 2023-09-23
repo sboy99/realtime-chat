@@ -1,4 +1,4 @@
-import { UserSchema } from '@app/common/dto';
+import { UserSchema } from '@app/common/dtos';
 import { z } from 'zod';
 
 const ip = z.string();

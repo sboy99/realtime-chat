@@ -4,7 +4,7 @@ server.port: 5601
 
 elasticsearch.hosts: ['http://elasticsearch:9200']
 elasticsearch.username: 'kibana'
-elasticsearch.password: 'qqYKn3Bri1VyhTakevdf'
+elasticsearch.password: 'password'
 
 # logging.dest: /var/log/kibana/kibana.log
 # logging.rotate.enabled: true

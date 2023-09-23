@@ -1,14 +1,16 @@
+import { MessagePatterns } from '@app/common/constants';
 import { User } from '@app/common/decorators';
+import { TUser } from '@app/common/types';
 import {
   Body,
   Controller,
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   Query,
 } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 import { CanAccess } from '../decorators/can-access';
 import { UpdateUserDto } from './dto';
 import { UserService } from './user.service';
@@ -23,9 +25,10 @@ export class UserController {
   }
 
   @Get('profile')
+  @MessagePattern(MessagePatterns.AUTHENTICATE)
   @CanAccess()
-  getUserProfile(@User('id', ParseUUIDPipe) userId: string) {
-    return this.userService.getUserProfile(userId);
+  getUserProfile(@User() user: TUser) {
+    return user;
   }
 
   @Get('search')
