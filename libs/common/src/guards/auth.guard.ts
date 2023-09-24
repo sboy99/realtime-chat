@@ -1,4 +1,4 @@
-import { MessagePatterns, Services } from '@app/common/constants';
+import { MessagePatterns, MicroServices } from '@app/common/constants';
 import {
   CanActivate,
   ExecutionContext,
@@ -12,7 +12,7 @@ import { TUser } from '../types';
 
 export class AuthGuard implements CanActivate {
   constructor(
-    @Inject(Services.AUTH_SERVICE) private readonly authClient: ClientProxy,
+    @Inject(MicroServices.AUTH_CLIENT) private readonly authClient: ClientProxy,
   ) {}
 
   canActivate(

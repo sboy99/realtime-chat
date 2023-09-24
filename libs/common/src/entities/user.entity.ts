@@ -1,6 +1,5 @@
 import { AbstractEntity } from '@app/infra/database';
-import { Column, Entity, ManyToMany, OneToMany, Unique } from 'typeorm';
-import { Conversation } from './conversation.entity';
+import { Column, Entity, OneToMany, Unique } from 'typeorm';
 import { Session } from './session.entity';
 
 @Entity('users')
@@ -26,7 +25,4 @@ export class User extends AbstractEntity<User> {
 
   @OneToMany(() => Session, (session) => session.user, { cascade: ['remove'] })
   sessions?: Array<string | Session>;
-
-  @ManyToMany(() => Conversation, (conversation) => conversation.participants)
-  conversations?: Array<string | Conversation>;
 }

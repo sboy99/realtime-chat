@@ -7,10 +7,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Query,
 } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CanAccess } from '../decorators/can-access';
 import { UpdateUserDto } from './dto';
 import { UserService } from './user.service';
@@ -37,9 +38,14 @@ export class UserController {
     return this.userService.searchUser(q);
   }
 
+  @MessagePattern(MessagePatterns.USER_LOOKUP)
+  lookupUser(@Payload('id', ParseUUIDPipe) userId: string) {
+    return this.userService.findOne(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
   @Patch(':id')

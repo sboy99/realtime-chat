@@ -1,3 +1,4 @@
+import { Session } from '@app/common/entities';
 import { IRequest } from '@app/common/interfaces';
 import { TJwtUser, TUser } from '@app/common/types';
 import { ForbiddenException, Injectable } from '@nestjs/common';
@@ -36,6 +37,10 @@ export class AccessTokenStrategy extends PassportStrategy(
     const user = await this.userService.getUserProfile(payload.id);
     // if user is blocked
     if (!!user.isBlocked) throw new ForbiddenException('User is blocked');
+
+    // select device session
+    user.sessions =
+      user.sessions?.filter((session) => (session as Session).ip) || [];
 
     return {
       ...user,

@@ -7,7 +7,7 @@ import { SessionRepository } from './session.repository';
 export class SessionService {
   constructor(private readonly sessionRepo: SessionRepository) {}
 
-  create(createSessionDto: CreateSessionDto) {
+  public create(createSessionDto: CreateSessionDto) {
     const session = new Session(createSessionDto);
     return this.sessionRepo.upsert(session, {
       conflictPaths: {
@@ -15,7 +15,7 @@ export class SessionService {
         userDevice: true,
       },
       skipUpdateIfNoValuesChanged: true,
-      upsertType: 'on-duplicate-key-update',
+      upsertType: 'on-conflict-do-update',
     });
   }
 }

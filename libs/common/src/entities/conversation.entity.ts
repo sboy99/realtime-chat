@@ -1,10 +1,17 @@
 import { AbstractEntity } from '@app/infra/database';
-import { Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Entity, Index, JoinColumn, OneToOne } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity('conversations')
+@Index(['creator.id', 'recipient.id'], {
+  unique: true,
+})
 export class Conversation extends AbstractEntity<Conversation> {
-  @ManyToMany(() => User, (user) => user.conversations)
-  @JoinTable()
-  participants?: Array<string | User>;
+  @OneToOne(() => User, { createForeignKeyConstraints: false })
+  @JoinColumn()
+  creator: User;
+
+  @OneToOne(() => User, { createForeignKeyConstraints: false })
+  @JoinColumn()
+  recipient: User;
 }

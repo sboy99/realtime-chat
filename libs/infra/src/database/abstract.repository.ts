@@ -1,7 +1,9 @@
 import { ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import {
   EntityManager,
+  FindManyOptions,
   FindOptionsRelations,
+  FindOptionsSelect,
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
@@ -13,8 +15,8 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   protected abstract readonly logger: Logger;
 
   constructor(
-    private readonly entityRepository: Repository<T>,
-    private readonly entityManager: EntityManager,
+    readonly entityRepository: Repository<T>,
+    readonly entityManager: EntityManager,
   ) {}
 
   async create(entity: T): Promise<T> {
@@ -28,8 +30,11 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
     return this.entityRepository.upsert(partialEntity, conflictPathsOrOptions);
   }
 
-  async list(where: FindOptionsWhere<T>) {
-    return this.entityRepository.findBy(where);
+  async list(
+    where: FindManyOptions<T>['where'],
+    relations?: FindManyOptions<T>['relations'],
+  ) {
+    return this.entityRepository.find({ where, relations });
   }
 
   async checkUnique(
@@ -50,10 +55,15 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
 
   async findOne(
     where: FindOptionsWhere<T>,
+    select?: FindOptionsSelect<T>,
     relations?: FindOptionsRelations<T>,
     notfoundMessage = 'Entity not found.',
   ): Promise<T> {
-    const entity = await this.entityRepository.findOne({ where, relations });
+    const entity = await this.entityRepository.findOne({
+      where,
+      select,
+      relations,
+    });
 
     if (!entity) {
       this.logger.warn('Document not found with where', where);

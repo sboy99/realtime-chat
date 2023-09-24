@@ -1,4 +1,5 @@
 import { User } from '@app/common/entities';
+import { omitKeys } from '@app/common/utils';
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserRepository } from './user.repository';
@@ -14,6 +15,15 @@ export class UserService {
   public async getUserProfile(userId: string) {
     return await this.userRepo.findOne(
       { id: userId },
+      {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        avatar: true,
+        sessions: true,
+        createdAt: true,
+      },
       {
         sessions: true,
       },
@@ -47,8 +57,14 @@ export class UserService {
     return this.userRepo.findOne({ email });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  public async findOne(id: string) {
+    const user = await this.userRepo.findOne(
+      { id },
+      undefined,
+      undefined,
+      'User does not exist',
+    );
+    return omitKeys(user, ['password']);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

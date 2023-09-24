@@ -1,4 +1,4 @@
-import { Queues, Services } from '@app/common/constants';
+import { MicroServices, Queues } from '@app/common/constants';
 import { Conversation, Session, User } from '@app/common/entities';
 import { DatabaseModule } from '@app/infra/database';
 import { LoggerModule } from '@app/infra/logger';
@@ -20,7 +20,7 @@ import { ConversationEnvSchema, TConversationEnv } from './env';
     ClientsModule.registerAsync({
       clients: [
         {
-          name: Services.AUTH_SERVICE,
+          name: MicroServices.AUTH_CLIENT,
           imports: [ConfigModule],
           inject: [ConfigService],
           useFactory: (configService: ConfigService<TConversationEnv>) => ({

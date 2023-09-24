@@ -1,4 +1,4 @@
-import { MessagePatterns, Services } from '@app/common/constants';
+import { MessagePatterns, MicroServices } from '@app/common/constants';
 import { User } from '@app/common/entities';
 import { TJwtUser } from '@app/common/types';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
@@ -19,7 +19,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<TAuthEnv>,
-    @Inject(Services.AUTH_SERVICE) private readonly authClient: ClientProxy,
+    @Inject(MicroServices.AUTH_CLIENT) private readonly authClient: ClientProxy,
   ) {}
 
   public async register(createUserDto: CreateUserDto) {
