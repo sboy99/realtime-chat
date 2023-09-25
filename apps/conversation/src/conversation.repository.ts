@@ -21,15 +21,15 @@ export class ConversationRepository extends AbstractRepository<Conversation> {
   findUserConversations(userId: string) {
     return this.entityRepository
       .createQueryBuilder('conversations')
-      .leftJoin('conversations.creator', 'c')
-      .addSelect(mapSelects('c', UserPropulateSelects))
-      .leftJoin('conversations.recipient', 'r')
-      .addSelect(mapSelects('r', UserPropulateSelects))
+      .leftJoin('conversations.creator', 'creator')
+      .addSelect(mapSelects('creator', UserPropulateSelects))
+      .leftJoin('conversations.recipient', 'recipient')
+      .addSelect(mapSelects('recipient', UserPropulateSelects))
       .where(
         'conversations.creator = :creatorId OR conversations.recipient = :recipientId',
         { creatorId: userId, recipientId: userId },
       )
-      .take(30)
+      .take(2)
       .getMany();
   }
 

@@ -57,7 +57,8 @@ export class ConversationService {
         id: c.id,
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
-        with: c.id === userId ? c.recipient : c.creator,
+        messages: c.messages,
+        with: c.creator.id === userId ? c.recipient : c.creator,
       };
     });
   }

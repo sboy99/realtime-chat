@@ -1,5 +1,5 @@
 import { MicroServices, Queues } from '@app/common/constants';
-import { Conversation, Session, User } from '@app/common/entities';
+import { Conversation, Message, Session, User } from '@app/common/entities';
 import { DatabaseModule } from '@app/infra/database';
 import { LoggerModule } from '@app/infra/logger';
 import { Module } from '@nestjs/common';
@@ -9,6 +9,7 @@ import { ConversationController } from './conversation.controller';
 import { ConversationRepository } from './conversation.repository';
 import { ConversationService } from './conversation.service';
 import { ConversationEnvSchema, TConversationEnv } from './env';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -34,8 +35,9 @@ import { ConversationEnvSchema, TConversationEnv } from './env';
       ],
     }),
     DatabaseModule,
-    DatabaseModule.forFeature([User, Session, Conversation]),
+    DatabaseModule.forFeature([User, Session, Conversation, Message]),
     LoggerModule,
+    MessageModule,
   ],
   controllers: [ConversationController],
   providers: [ConversationService, ConversationRepository],
