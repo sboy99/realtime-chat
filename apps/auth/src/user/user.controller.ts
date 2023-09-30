@@ -1,11 +1,13 @@
 import { MessagePatterns } from '@app/common/constants';
 import { User } from '@app/common/decorators';
-import { TUser } from '@app/common/types';
+import { TApiResponse, TUser } from '@app/common/types';
 import {
   Body,
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -25,11 +27,15 @@ export class UserController {
     return this.userService.listUsers();
   }
 
+  @HttpCode(HttpStatus.OK)
   @Get('profile')
   @MessagePattern(MessagePatterns.AUTHENTICATE)
   @CanAccess()
-  getUserProfile(@User() user: TUser) {
-    return user;
+  async getUserProfile(@User() user: TUser): TApiResponse {
+    return {
+      statusCode: HttpStatus.OK,
+      data: user,
+    };
   }
 
   @Get('search')

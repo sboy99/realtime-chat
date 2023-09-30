@@ -110,6 +110,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
+    restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
       PGADMIN_DEFAULT_PASSWORD: adminpassword
@@ -117,6 +118,8 @@ services:
       - '8080:80'
     networks:
       - realtime_chat_net
+    volumes:
+      - realtime_chat_pg_admin_data:/var/lib/pgadmin
     depends_on:
       postgres:
         condition: service_healthy
@@ -141,6 +144,8 @@ volumes:
     name: realtime_chat_broker
   realtime_chat_es_data:
     name: realtime_chat_es_data
+  realtime_chat_pg_admin_data:
+    name: realtime_chat_pg_admin_data
 
 networks:
   realtime_chat_net:

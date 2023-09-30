@@ -5,10 +5,10 @@ import { Session } from './session.entity';
 @Entity('users')
 @Unique('unique_email', ['email'])
 export class User extends AbstractEntity<User> {
-  @Column()
+  @Column({ name: 'first_name' })
   firstName: string;
 
-  @Column()
+  @Column({ name: 'last_name' })
   lastName: string;
 
   @Column({ name: 'avatar', type: 'varchar', default: null })
@@ -17,10 +17,10 @@ export class User extends AbstractEntity<User> {
   @Column({ name: 'email', unique: true })
   email: string;
 
-  @Column()
+  @Column({ name: 'password' })
   password: string;
 
-  @Column({ default: false })
+  @Column({ name: 'is_blocked', default: false })
   isBlocked?: boolean;
 
   @OneToMany(() => Session, (session) => session.user, { cascade: ['remove'] })

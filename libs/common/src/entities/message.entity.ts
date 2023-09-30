@@ -2,16 +2,16 @@ import { Conversation, User } from '@app/common/entities';
 import { AbstractEntity } from '@app/infra/database';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
-@Entity()
+@Entity('messages')
 export class Message extends AbstractEntity<Message> {
   @ManyToOne(() => User, { createForeignKeyConstraints: false })
-  @JoinColumn()
+  @JoinColumn({ name: 'creator_id' })
   creator: Partial<User>;
 
   @Column()
   message: string;
 
   @ManyToOne(() => Conversation, (conversation) => conversation.messages)
-  @JoinColumn()
+  @JoinColumn({ name: 'conversation_id' })
   conversation: Partial<Conversation>;
 }

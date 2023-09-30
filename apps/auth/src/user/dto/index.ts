@@ -1,9 +1,18 @@
 import { z } from 'zod';
 
-const firstName = z.string().max(128);
-const lastName = z.string().max(128);
+const firstName = z
+  .string()
+  .max(128)
+  .transform((u) => u.toLowerCase());
+const lastName = z
+  .string()
+  .max(128)
+  .transform((u) => u.toLowerCase());
 const avatar = z.string().url('Provide a valid url').optional();
-const email = z.string().email();
+const email = z
+  .string()
+  .email()
+  .transform((u) => u.toLowerCase());
 const password = z.string();
 
 export const CreateUserSchema = z.object({

@@ -1,11 +1,13 @@
 import { Routes } from '@app/common/constants';
 import { UseAuth, User } from '@app/common/decorators';
 import { ZodValidationPipe } from '@app/common/pipes';
-import { TUser } from '@app/common/types';
+import { TApiResponse, TUser } from '@app/common/types';
 import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -22,23 +24,35 @@ export class ConversationController {
     private readonly messageService: MessageService,
   ) {}
 
+  @HttpCode(HttpStatus.OK)
   @Post()
   @UseAuth()
-  create(
+  async create(
     @User() user: TUser,
     @Body(new ZodValidationPipe(CreateConversationSchema))
     createConversationDto: CreateConversationDto,
-  ) {
-    return this.conversationService.create({
+  ): TApiResponse {
+    await this.conversationService.create({
       user: user,
       friendId: createConversationDto.friendId,
     });
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Conversation created successfully',
+    };
   }
 
   @Get()
   @UseAuth()
-  findMyConversations(@User() user: TUser) {
-    return this.conversationService.findUserConversations(user.id);
+  async findMyConversations(@User() user: TUser): TApiResponse {
+    const conversations = await this.conversationService.findUserConversations(
+      user.id,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      data: conversations,
+    };
   }
 
   @Post('message')
