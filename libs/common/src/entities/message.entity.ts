@@ -1,6 +1,6 @@
-import { Conversation, User } from '@app/common/entities';
+import { Conversation, MessageAttachment, User } from '@app/common/entities';
 import { AbstractEntity } from '@app/infra/database';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('messages')
 export class Message extends AbstractEntity<Message> {
@@ -10,6 +10,11 @@ export class Message extends AbstractEntity<Message> {
 
   @Column()
   message: string;
+
+  @OneToMany(() => MessageAttachment, (attachment) => attachment.message, {
+    onDelete: 'CASCADE',
+  })
+  attachments: MessageAttachment[];
 
   @ManyToOne(() => Conversation, (conversation) => conversation.messages)
   @JoinColumn({ name: 'conversation_id' })
