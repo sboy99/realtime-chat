@@ -11,9 +11,7 @@ export class Message extends AbstractEntity<Message> {
   @Column()
   message: string;
 
-  @OneToMany(() => MessageAttachment, (attachment) => attachment.message, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => MessageAttachment, (attachment) => attachment.message)
   attachments: MessageAttachment[];
 
   @ManyToOne(() => Conversation, (conversation) => conversation.messages)

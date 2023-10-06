@@ -13,6 +13,8 @@ export const POSTGRES_USER = str;
 export const POSTGRES_PASSWORD = str;
 
 export const HTTP_PORT = num;
+// Redis
+export const REDIS_URI = str;
 // RabbitMQ
 export const RABBITMQ_URI = str;
 // Secrets

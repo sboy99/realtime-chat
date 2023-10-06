@@ -25,7 +25,6 @@ export class AuthGuard implements CanActivate {
     if (!bearerToken)
       throw new UnauthorizedException('Authorization token is required');
 
-    console.log(bearerToken);
     // send auth microservice authenticate request
     return this.authClient
       .send<TUser>(MessagePatterns.AUTHENTICATE, { bearerToken })

@@ -1,6 +1,6 @@
 import { MessagePatterns } from '@app/common/constants';
 import { User } from '@app/common/decorators';
-import { TApiResponse, TUser } from '@app/common/types';
+import { TUser } from '@app/common/types';
 import {
   Body,
   Controller,
@@ -31,11 +31,8 @@ export class UserController {
   @Get('profile')
   @MessagePattern(MessagePatterns.AUTHENTICATE)
   @CanAccess()
-  async getUserProfile(@User() user: TUser): TApiResponse {
-    return {
-      statusCode: HttpStatus.OK,
-      data: user,
-    };
+  async getUserProfile(@User() user: TUser) {
+    return user;
   }
 
   @Get('search')
