@@ -7,7 +7,7 @@ export class MessageAttachment extends AbstractEntity<MessageAttachment> {
   @ManyToOne(() => Message, (message) => message.attachments, {
     onDelete: 'SET NULL',
   })
-  @Column({ name: 'message_id' })
+  @JoinColumn({ name: 'message_id' })
   message: Message;
 
   @Column()

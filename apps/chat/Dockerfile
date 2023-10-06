@@ -9,13 +9,13 @@ COPY nest-cli.json nest-cli.json
 
 RUN npm install -g pnpm
 
-COPY apps/conversation apps/conversation
+COPY apps/chat apps/chat
 COPY libs libs
 
-RUN pnpm install 
-RUN pnpm install -C ./apps/conversation
+RUN pnpm install
+RUN pnpm install -C ./apps/chat
 
-RUN pnpm run build conversation
+RUN pnpm run build chat
 
 FROM node:alpine as production
 
@@ -33,4 +33,4 @@ RUN pnpm install --prod
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/conversation/main"]
+CMD ["node", "dist/apps/chat/main"]

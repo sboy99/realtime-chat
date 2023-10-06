@@ -1,5 +1,11 @@
 import { MicroServices, Queues } from '@app/common/constants';
-import { Conversation, Message, Session, User } from '@app/common/entities';
+import {
+  Conversation,
+  Message,
+  MessageAttachment,
+  Session,
+  User,
+} from '@app/common/entities';
 import { DatabaseModule } from '@app/infra/database';
 import { LoggerModule } from '@app/infra/logger';
 import { Module } from '@nestjs/common';
@@ -35,7 +41,13 @@ import { MessageModule } from './message/message.module';
       ],
     }),
     DatabaseModule,
-    DatabaseModule.forFeature([User, Session, Conversation, Message]),
+    DatabaseModule.forFeature([
+      User,
+      Session,
+      Conversation,
+      Message,
+      MessageAttachment,
+    ]),
     LoggerModule,
     MessageModule,
   ],

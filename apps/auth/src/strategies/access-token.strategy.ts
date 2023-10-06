@@ -26,6 +26,7 @@ export class AccessTokenStrategy extends PassportStrategy(
         (req: IRequest) => {
           const bearertoken =
             req?.headers?.['authorization'] || req?.bearerToken;
+
           if (!bearertoken) throw new ForbiddenException('Access Denied');
           return bearertoken.split(' ')?.[1];
         },

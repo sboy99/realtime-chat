@@ -1,4 +1,9 @@
-import { Conversation, Message, User } from '@app/common/entities';
+import {
+  Conversation,
+  Message,
+  MessageAttachment,
+  User,
+} from '@app/common/entities';
 import { DatabaseModule } from '@app/infra/database';
 import { SearchModule } from '@app/infra/search';
 import { Module } from '@nestjs/common';
@@ -10,7 +15,7 @@ import { UserSubscriber } from './user.subscriber';
 
 @Module({
   imports: [
-    DatabaseModule.forFeature([User, Conversation, Message]),
+    DatabaseModule.forFeature([User, Conversation, Message, MessageAttachment]),
     SearchModule,
   ],
   controllers: [UserController],
