@@ -1,5 +1,12 @@
+import { MessagePatterns, SocketEvents } from '@app/common/constants';
+import {
+  ConversationMessageDto,
+  ConversationMessageSchema,
+} from '@app/common/dtos';
+import { ZodValidationPipe } from '@app/common/pipes';
 import { pickKeys } from '@app/common/utils';
 import { Logger } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   ConnectedSocket,
   MessageBody,
@@ -9,7 +16,6 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { from, map } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { ChatSessionManager } from './chat.session';
 import { IAuthSocket } from './interfaces';
@@ -36,11 +42,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() message: string,
   ) {
     this.chatSessionManager.getSockets().forEach((sockets) => {
-      const socket = sockets[0];
-      if (socket.user.id !== client.user.id)
-        sockets
-          .filter((s) => s.id !== client.id)
-          .forEach((socket) =>
+      sockets
+        .filter((s) => s.id !== client.id)
+        .forEach((socket) => {
+          if (socket.user.id !== client.user.id)
             socket.emit('message', {
               user: pickKeys(client.user, [
                 'firstName',
@@ -49,20 +54,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 'id',
               ]),
               message,
-            }),
-          );
+            });
+        });
     });
   }
+  // todo: alter microservice call flow
+  @MessagePattern(MessagePatterns.CONVERSATION_MESSAGE)
+  onConversationMessage(
+    @Payload(new ZodValidationPipe(ConversationMessageSchema))
+    conversationMessageDto: ConversationMessageDto,
+  ) {
+    const eventName = `${SocketEvents.CONVERSATION_MESSAGE}:${conversationMessageDto.conversationId}`;
+    console.log(eventName);
 
-  @SubscribeMessage('count')
-  handleCount() {
-    return from([1, 2, 3, 4, 5]).pipe(
-      map((count) => {
-        this.server.emit('count', {
-          event: 'count',
-          data: count,
-        });
-      }),
-    );
+    this.server.emit(eventName, conversationMessageDto);
   }
 }

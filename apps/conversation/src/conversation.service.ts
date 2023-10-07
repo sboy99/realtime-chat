@@ -46,7 +46,8 @@ export class ConversationService {
         catchError(() => {
           throw new NotFoundException('Friend does not exist');
         }),
-      );
+      )
+      .subscribe();
   }
 
   async findUserConversations(userId: string) {

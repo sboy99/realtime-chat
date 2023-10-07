@@ -24,7 +24,7 @@ export class MessageController {
     @Body(new ZodValidationPipe(CreateMessageSchema))
     createMessageDto: CreateMessageDto,
   ) {
-    return this.messageService.create(user.id, createMessageDto);
+    return this.messageService.create(user, createMessageDto);
   }
 
   @Get()
