@@ -1,19 +1,25 @@
 import { MessagePatterns, MicroServices } from '@app/common/constants';
 import { TUser } from '@app/common/types';
-import { INestApplicationContext, UnauthorizedException } from '@nestjs/common';
+import {
+  INestApplicationContext,
+  UnauthorizedException,
+  WebSocketAdapter,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
 import { catchError, map, tap } from 'rxjs';
-import { ServerOptions } from 'socket.io';
+import { Server, ServerOptions } from 'socket.io';
+import { ChatSessionManager } from '../chat.session';
 import { TChatEnv } from '../env';
 import { IAuthSocket } from '../interfaces';
 
-export class RedisIoAdapter extends IoAdapter {
+export class RedisIoAdapter extends IoAdapter implements WebSocketAdapter {
   private adapterConstructor: ReturnType<typeof createAdapter>;
   private authClient: ClientProxy;
+  private chatSessionManager: ChatSessionManager;
 
   constructor(
     private readonly app: INestApplicationContext,
@@ -21,6 +27,8 @@ export class RedisIoAdapter extends IoAdapter {
   ) {
     super(app);
     this.authClient = this.app?.get<ClientProxy>(MicroServices.AUTH_CLIENT);
+    this.chatSessionManager =
+      this.app?.get<ChatSessionManager>(ChatSessionManager);
   }
 
   async connectToRedis(): Promise<void> {
@@ -46,8 +54,10 @@ export class RedisIoAdapter extends IoAdapter {
       .pipe(
         tap((u) => (socket.user = u)),
         map(() => true),
-        catchError((e) => {
-          return next(e);
+        catchError(() => {
+          return next(
+            new UnauthorizedException('Invalid authentication token'),
+          );
         }),
       )
       .subscribe(() => {
@@ -62,4 +72,24 @@ export class RedisIoAdapter extends IoAdapter {
 
     return server;
   }
+
+  public bindClientConnect = (
+    server: Server,
+    callback: (socket: IAuthSocket) => void,
+  ) => {
+    server.on('connection', (socket: IAuthSocket) => {
+      if (!!socket?.user?.id) {
+        this.chatSessionManager.setUserSocket(socket?.user?.id, socket);
+
+        socket.on('disconnect', () => {
+          this.chatSessionManager.removeUserSocket(
+            socket?.user?.id as string,
+            socket,
+          );
+        });
+      }
+
+      callback(socket);
+    });
+  };
 }
