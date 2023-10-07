@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
+import { ChatSessionManager } from './chat.session';
 import { ChatEnvSchema, TChatEnv } from './env';
 
 @Module({
@@ -34,6 +35,6 @@ import { ChatEnvSchema, TChatEnv } from './env';
     DatabaseModule,
     LoggerModule,
   ],
-  providers: [ChatGateway, ChatService],
+  providers: [ChatGateway, ChatSessionManager, ChatService],
 })
 export class ChatModule {}
