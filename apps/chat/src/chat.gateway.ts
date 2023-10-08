@@ -1,4 +1,4 @@
-import { MessagePatterns, SocketEvents } from '@app/common/constants';
+import { SocketEvents } from '@app/common/constants';
 import {
   ConversationMessageDto,
   ConversationMessageSchema,
@@ -6,7 +6,6 @@ import {
 import { ZodValidationPipe } from '@app/common/pipes';
 import { pickKeys } from '@app/common/utils';
 import { Logger } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   ConnectedSocket,
   MessageBody,
@@ -18,6 +17,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatSessionManager } from './chat.session';
+import { SocketUser } from './decorators';
 import { IAuthSocket } from './interfaces';
 
 @WebSocketGateway()
@@ -59,9 +59,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
   // todo: alter microservice call flow
-  @MessagePattern(MessagePatterns.CONVERSATION_MESSAGE)
+  @SubscribeMessage(SocketEvents.CONVERSATION_MESSAGE)
   onConversationMessage(
-    @Payload(new ZodValidationPipe(ConversationMessageSchema))
+    @SocketUser('id') userId: string,
+    @MessageBody(new ZodValidationPipe(ConversationMessageSchema))
     conversationMessageDto: ConversationMessageDto,
   ) {
     const eventName = `${SocketEvents.CONVERSATION_MESSAGE}:${conversationMessageDto.conversationId}`;
