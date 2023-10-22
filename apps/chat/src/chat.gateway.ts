@@ -3,9 +3,8 @@ import {
   ConversationMessageDto,
   ConversationMessageSchema,
 } from '@app/common/dtos';
-import { ZodValidationPipe } from '@app/common/pipes';
 import { pickKeys } from '@app/common/utils';
-import { Logger } from '@nestjs/common';
+import { Logger, UseFilters } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -16,24 +15,40 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ChatService } from './chat.service';
 import { ChatSessionManager } from './chat.session';
 import { SocketUser } from './decorators';
+import { WsFilter } from './filters';
 import { IAuthSocket } from './interfaces';
+import { SocketZodValidationPipe } from './pipes';
 
+@UseFilters(new WsFilter())
 @WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private readonly server: Server;
   private readonly logger = new Logger(ChatGateway.name);
 
-  constructor(private readonly chatSessionManager: ChatSessionManager) {}
+  constructor(
+    private readonly chatSessionManager: ChatSessionManager,
+    private readonly chatService: ChatService,
+  ) {}
 
-  handleConnection(client: IAuthSocket) {
-    this.logger.log(`New connection : ${client?.user?.email}`);
+  handleConnection(socket: IAuthSocket) {
+    if (!!socket?.user?.id) {
+      this.chatSessionManager.setUserSocket(socket?.user?.id, socket);
+
+      socket.on('disconnect', () => {
+        this.chatSessionManager.removeUserSocket(
+          socket?.user?.id as string,
+          socket,
+        );
+      });
+    }
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`${client.id} disconnected`);
+    this.logger.log(`${client.id} disconnected`);
   }
 
   @SubscribeMessage('message')
@@ -60,14 +75,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   // todo: alter microservice call flow
   @SubscribeMessage(SocketEvents.CONVERSATION_MESSAGE)
-  onConversationMessage(
+  async onConversationMessage(
     @SocketUser('id') userId: string,
-    @MessageBody(new ZodValidationPipe(ConversationMessageSchema))
+    @MessageBody(new SocketZodValidationPipe(ConversationMessageSchema))
     conversationMessageDto: ConversationMessageDto,
   ) {
-    const eventName = `${SocketEvents.CONVERSATION_MESSAGE}:${conversationMessageDto.conversationId}`;
-    console.log(eventName);
+    // const
+    const conversationId = conversationMessageDto.conversationId;
 
-    this.server.emit(eventName, conversationMessageDto);
+    // verify conversation
+    await this.chatService.verifyConversation(userId, conversationId);
+
+    // emit event
+    const eventName = `${SocketEvents.CONVERSATION_MESSAGE}:${conversationId}`;
+    const reciepientId = conversationMessageDto.toUser.id;
+    const reciepientSocket =
+      this.chatSessionManager.getUserSocket(reciepientId)[0];
+
+    if (!!reciepientSocket)
+      reciepientSocket.emit(eventName, conversationMessageDto);
+
+    // call microservice to persist data
+    await this.chatService.saveMessage(
+      conversationId,
+      conversationMessageDto.message,
+    );
   }
 }
