@@ -1,4 +1,4 @@
 export const Queues = {
   AUTH_QUEUE: 'auth_queue',
-  CHAT_QUEUE: 'chat_queue',
+  CONVERSATION_QUEUE: 'conversation_queue',
 } as const;

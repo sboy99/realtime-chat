@@ -12,13 +12,13 @@ import {
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
-import { ConversationService } from './conversation.service';
-import { CreateConversationDto, CreateConversationSchema } from './dtos';
-import { CreateMessageDto, CreateMessageSchema } from './message/dtos';
-import { MessageService } from './message/message.service';
+import { ConversationService } from '../conversation.service';
+import { CreateConversationDto, CreateConversationSchema } from '../dtos';
+import { CreateMessageDto, CreateMessageSchema } from '../message/dtos';
+import { MessageService } from '../message/message.service';
 
 @Controller(Routes.CONVERSATION)
-export class ConversationController {
+export class ConversationHttpController {
   constructor(
     private readonly conversationService: ConversationService,
     private readonly messageService: MessageService,

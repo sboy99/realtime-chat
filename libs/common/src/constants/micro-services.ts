@@ -1,4 +1,4 @@
 export const MicroServices = {
   AUTH_CLIENT: 'AUTH_CLIENT',
-  CHAT_CLIENT: 'CHAT_CLIENT',
+  CONVERSATION_CLIENT: 'CONVERSATION_CLIENT',
 } as const;

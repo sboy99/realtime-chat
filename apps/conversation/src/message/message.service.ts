@@ -1,19 +1,12 @@
-import { MessagePatterns, MicroServices } from '@app/common/constants';
-import { ConversationMessageDto } from '@app/common/dtos';
 import { Message } from '@app/common/entities';
 import { TUser } from '@app/common/types';
-import { pickKeys } from '@app/common/utils';
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dtos';
 import { MessageRepository } from './message.repository';
 
 @Injectable()
 export class MessageService {
-  constructor(
-    private readonly messageRepository: MessageRepository,
-    @Inject(MicroServices.CHAT_CLIENT) private readonly chatClient: ClientProxy,
-  ) {}
+  constructor(private readonly messageRepository: MessageRepository) {}
 
   async create(creator: TUser, createMessageDto: CreateMessageDto) {
     const _message = new Message({
@@ -27,13 +20,6 @@ export class MessageService {
     });
 
     const message = await this.messageRepository.create(_message);
-    this.chatClient.emit<any, ConversationMessageDto>(
-      MessagePatterns.CONVERSATION_MESSAGE,
-      {
-        ...createMessageDto,
-        user: pickKeys(creator, ['id', 'firstName', 'lastName', 'avatar']),
-      },
-    );
 
     return message;
   }

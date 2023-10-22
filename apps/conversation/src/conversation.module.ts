@@ -11,7 +11,10 @@ import { LoggerModule } from '@app/infra/logger';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConversationController } from './conversation.controller';
+import {
+  ConversationHttpController,
+  ConversationMsController,
+} from './controllers';
 import { ConversationRepository } from './conversation.repository';
 import { ConversationService } from './conversation.service';
 import { ConversationEnvSchema, TConversationEnv } from './env';
@@ -51,7 +54,7 @@ import { MessageModule } from './message/message.module';
     LoggerModule,
     MessageModule,
   ],
-  controllers: [ConversationController],
+  controllers: [ConversationHttpController, ConversationMsController],
   providers: [ConversationService, ConversationRepository],
 })
 export class ConversationModule {}
