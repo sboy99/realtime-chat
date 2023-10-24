@@ -3,10 +3,9 @@ import {
   ConversationMessageDto,
   ConversationMessageSchema,
 } from '@app/common/dtos';
-import { pickKeys } from '@app/common/utils';
+import { TUser } from '@app/common/types';
 import { Logger, UseFilters } from '@nestjs/common';
 import {
-  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -14,7 +13,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { ChatService } from './chat.service';
 import { ChatSessionManager } from './chat.session';
 import { SocketUser } from './decorators';
@@ -34,49 +33,42 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly chatService: ChatService,
   ) {}
 
+  /**
+   * The function `handleConnection` sets the user socket in the chat session manager if the socket has
+   * a user ID.
+   * @param {IAuthSocket} socket - The `socket` parameter is an object of type `IAuthSocket`.
+   */
   handleConnection(socket: IAuthSocket) {
     if (!!socket?.user?.id) {
       this.chatSessionManager.setUserSocket(socket?.user?.id, socket);
-
-      socket.on('disconnect', () => {
-        this.chatSessionManager.removeUserSocket(
-          socket?.user?.id as string,
-          socket,
-        );
-      });
     }
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`${client.id} disconnected`);
+  /**
+   * The handleDisconnect function removes a user's socket from the chat session manager.
+   * @param {IAuthSocket} socket - The `socket` parameter is of type `IAuthSocket`. It represents a
+   * socket connection with a user and contains information about the user, such as their ID.
+   */
+  handleDisconnect(socket: IAuthSocket) {
+    this.chatSessionManager.removeUserSocket(
+      socket?.user?.id as string,
+      socket,
+    );
   }
 
-  @SubscribeMessage('message')
-  handleMessage(
-    @ConnectedSocket() client: IAuthSocket,
-    @MessageBody() message: string,
-  ) {
-    this.chatSessionManager.getSockets().forEach((sockets) => {
-      sockets
-        .filter((s) => s.id !== client.id)
-        .forEach((socket) => {
-          if (socket.user.id !== client.user.id)
-            socket.emit('message', {
-              user: pickKeys(client.user, [
-                'firstName',
-                'lastName',
-                'avatar',
-                'id',
-              ]),
-              message,
-            });
-        });
-    });
-  }
-  // todo: alter microservice call flow
+  /**
+   * This function handles incoming conversation messages, verifies the conversation, emits an event to
+   * the recipient, and saves the message in the database.
+   * @param {string} userId - The `userId` parameter is the ID of the user who sent the conversation
+   * message. It is extracted from the socket connection.
+   * @param {ConversationMessageDto} conversationMessageDto - The `conversationMessageDto` parameter is
+   * an object that represents the conversation message data. It contains properties such as
+   * `conversationId`, which is the ID of the conversation the message belongs to, and `toUser`, which
+   * is the user the message is being sent to. The `message` property contains
+   */
   @SubscribeMessage(SocketEvents.CONVERSATION_MESSAGE)
   async onConversationMessage(
-    @SocketUser('id') userId: string,
+    @SocketUser() user: TUser,
     @MessageBody(new SocketZodValidationPipe(ConversationMessageSchema))
     conversationMessageDto: ConversationMessageDto,
   ) {
@@ -84,7 +76,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const conversationId = conversationMessageDto.conversationId;
 
     // verify conversation
-    await this.chatService.verifyConversation(userId, conversationId);
+    await this.chatService.verifyConversation(user.id, conversationId);
 
     // emit event
     const eventName = `${SocketEvents.CONVERSATION_MESSAGE}:${conversationId}`;
@@ -96,9 +88,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       reciepientSocket.emit(eventName, conversationMessageDto);
 
     // call microservice to persist data
-    await this.chatService.saveMessage(
+    this.chatService.saveMessage({
       conversationId,
-      conversationMessageDto.message,
-    );
+      creator: user,
+      message: conversationMessageDto.message,
+    });
   }
 }

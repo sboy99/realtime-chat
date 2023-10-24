@@ -12,4 +12,22 @@ export const ConversationMessageSchema = z.object({
   toUser: ChatUserSchema,
 });
 
+export const ConversationLookupSchema = z.object({
+  userId: z.string().uuid(),
+  conversationId: z.string().uuid(),
+});
+
+export const CreateConversationMessageSchema = z.object({
+  creator: ChatUserSchema,
+  conversationId: z.string().uuid(),
+  message: z.string(),
+});
+
+// types //
 export type ConversationMessageDto = z.infer<typeof ConversationMessageSchema>;
+
+export type ConversationLookupDto = z.infer<typeof ConversationLookupSchema>;
+
+export type CreateConversationMessageDto = z.infer<
+  typeof CreateConversationMessageSchema
+>;

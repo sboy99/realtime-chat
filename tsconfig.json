@@ -23,5 +23,7 @@
       "@app/infra": ["libs/infra/src"],
       "@app/infra/*": ["libs/infra/src/*"]
     }
-  }
+  },
+  "include": ["apps/**/*", "libs/**/*"],
+  "exclude": ["node_modules", "dist", "extras"]
 }
