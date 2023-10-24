@@ -1,8 +1,12 @@
 import { MessagePatterns } from '@app/common/constants';
 import {
-  TConversationLookupPayload,
-  TConversationMessagePayload,
-} from '@app/common/types';
+  ConversationLookupDto,
+  ConversationLookupSchema,
+  CreateConversationMessageDto,
+  CreateConversationMessageSchema,
+} from '@app/common/dtos';
+import { ZodValidationPipe } from '@app/common/pipes';
+import { TUser } from '@app/common/types';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ConversationService } from '../conversation.service';
@@ -16,14 +20,24 @@ export class ConversationMsController {
   ) {}
 
   @MessagePattern(MessagePatterns.CONVERSATION_LOOKUP)
-  async lookupConversation(@Payload() message: TConversationLookupPayload) {
-    console.log(message);
-    return true;
+  async lookupConversation(
+    @Payload(new ZodValidationPipe(ConversationLookupSchema))
+    conversationLookupDto: ConversationLookupDto,
+  ) {
+    const isConversationExists =
+      await this.conversationService.lookupConversation(conversationLookupDto);
+
+    return isConversationExists;
   }
 
-  @MessagePattern(MessagePatterns.CONVERSATION_MESSAGE)
-  async saveMessage(@Payload() message: TConversationMessagePayload) {
-    console.log(message);
-    return true;
+  @MessagePattern(MessagePatterns.CREATE_CONVERSATION_MESSAGE)
+  async saveMessage(
+    @Payload(new ZodValidationPipe(CreateConversationMessageSchema))
+    { creator, conversationId, message }: CreateConversationMessageDto,
+  ) {
+    await this.messageService.create(creator as TUser, {
+      conversationId,
+      message,
+    });
   }
 }

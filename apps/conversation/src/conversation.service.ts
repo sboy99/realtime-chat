@@ -1,4 +1,5 @@
 import { MessagePatterns, MicroServices } from '@app/common/constants';
+import { ConversationLookupDto } from '@app/common/dtos';
 import { Conversation, User } from '@app/common/entities';
 import { TUser } from '@app/common/types';
 import {
@@ -62,5 +63,12 @@ export class ConversationService {
         with: c.creator.id === userId ? c.recipient : c.creator,
       };
     });
+  }
+
+  async lookupConversation(payload: ConversationLookupDto) {
+    return this.conversationRepository.lookupUserConversation(
+      payload.userId,
+      payload.conversationId,
+    );
   }
 }
