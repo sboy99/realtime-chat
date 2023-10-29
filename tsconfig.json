@@ -18,12 +18,27 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/common": ["libs/common/src"],
-      "@app/common/*": ["libs/common/src/*"],
-      "@app/infra": ["libs/infra/src"],
-      "@app/infra/*": ["libs/infra/src/*"]
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
+      ],
+      "@app/infra": [
+        "libs/infra/src"
+      ],
+      "@app/infra/*": [
+        "libs/infra/src/*"
+      ]
     }
   },
-  "include": ["apps/**/*", "libs/**/*"],
-  "exclude": ["node_modules", "dist", "extras"]
+  "include": [
+    "apps/**/*",
+    "libs/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "extras"
+  ]
 }

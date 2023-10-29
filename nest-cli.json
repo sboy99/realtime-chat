@@ -52,6 +52,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/chat/tsconfig.app.json"
       }
+    },
+    "friend": {
+      "type": "application",
+      "root": "apps/friend",
+      "entryFile": "main",
+      "sourceRoot": "apps/friend/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/friend/tsconfig.app.json"
+      }
     }
   },
   "monorepo": true,
