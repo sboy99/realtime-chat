@@ -19,6 +19,6 @@
 
 ### TODO:
 
-[] Run Friend App
-[] Design Friend Entity
-[] Implement methods
+- [] Run Friend App
+- [] Design Friend Entity
+- [] Implement methods
