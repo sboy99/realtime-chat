@@ -66,6 +66,27 @@ services:
     networks:
       - realtime_chat_net
 
+  friend:
+    build:
+      context: .
+      dockerfile: ./apps/friend/Dockerfile
+      target: development
+    command: pnpm run start:dev friend
+    container_name: realtime_chat_friend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - ./apps/friend/.env
+    ports:
+      - '3004:3004'
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - realtime_chat_net
+
   # Infra
   postgres:
     image: postgres:latest
